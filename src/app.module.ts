@@ -8,6 +8,7 @@ import { AuthModule } from './auth/auth.module';
 import { AuthController } from './auth/auth.controller';
 import { ConfigModule } from '@nestjs/config';
 import { MailModule } from './auth/email.module';
+import { ProductsModule } from './products/products.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { MailModule } from './auth/email.module';
     RedisModule,
     AuthModule,
     MailModule,
+    ProductsModule,
   ],
   controllers: [
     AppController,

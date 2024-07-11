@@ -8,9 +8,6 @@ export class MailService {
   async sendConfirmationEmail(email: string, confirmationCode: string): Promise<void> {
     await this.mailerService.sendMail({
       to: email,
-      from: 'denis.goptsii@gmail.com',
-      subject: 'x7uned test',
-      text: `x7uned test ${confirmationCode}`
     });
   }
 }
