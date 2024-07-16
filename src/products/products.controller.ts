@@ -26,6 +26,11 @@ export class ProductsController {
     return this.productsService.findPage(query);
   }
 
+  @Get('categories')
+  async getCategories() {
+    return this.productsService.getCategories()
+  }
+
   @Get('brands')
   async getBrands() {
     return this.productsService.getBrands()

@@ -5,6 +5,7 @@ import * as bcrypt from 'bcryptjs';
 import { MailerService } from '@nestjs-modules/mailer';
 import { ConfirmUserDto, LoginUserDto, OAuthDto, RegisterUserDto, MeDto } from './auth.dto';
 import { v4 as uuidv4 } from 'uuid';
+import { QueryFindUser } from './auth.controller';
 
 @Injectable()
 export class AuthService {
@@ -15,14 +16,26 @@ export class AuthService {
   ) {}
 
   async validateUser(email: string, pass: string): Promise<any> {
-    const user = await this.redisClient.hgetall(`user:${email}`);
-    if (!user || Object.keys(user).length === 0) {
-      throw new NotFoundException('User not found');
+    const keys = await this.redisClient.keys('user:*');
+    
+    for (const key of keys) {
+      const user = await this.redisClient.hgetall(key);
+      if (user.email === email) {
+        if (bcrypt.compareSync(pass, user.password)) {
+          return {
+            id: user.id,
+            email: user.email,
+            username: user.username,
+            avatar: user.avatar,
+            confirmationCode: user.confirmationCode,
+          };
+        } else {
+          throw new UnauthorizedException('Invalid credentials');
+        }
+      }
     }
-    if (user && bcrypt.compareSync(pass, user.password)) {
-      return { id: user.id, email: user.email, username: user.username, avatar: user.avatar, confirmationCode: user.confirmationCode };
-    }
-    throw new UnauthorizedException('Invalid credentials');
+
+    throw new NotFoundException('User not found');
   }
 
   async login(loginUserDto: LoginUserDto) {
@@ -43,6 +56,19 @@ export class AuthService {
     };
   }
 
+  async findUser(query: QueryFindUser) {
+    const {id} = query;
+
+    const existingUsers = await this.redisClient.keys(`user:${id}`);
+    
+    for (const userKey of existingUsers) {
+      const user = await this.redisClient.hgetall(userKey);
+      delete(user.password)
+      return {success: true, user}
+    }
+    return {success:false}
+  }
+
   async register(registerUserDto: RegisterUserDto) {
     const { username, password, email } = registerUserDto;
     const existingUsers = await this.redisClient.keys('user:*');
@@ -58,7 +84,7 @@ export class AuthService {
     const confirmationCode = Math.random().toString(36).substring(2, 15);
     const userId = uuidv4();
 
-    await this.redisClient.hmset(`user:${email}`, {
+    await this.redisClient.hmset(`user:${userId}`, {
       id: userId,
       username,
       email,
@@ -99,7 +125,7 @@ export class AuthService {
 
     const userId = uuidv4();
 
-    await this.redisClient.hmset(`user:${email}`, {
+    await this.redisClient.hmset(`user:${userId}`, {
       id: userId,
       username,
       email,
@@ -124,12 +150,12 @@ export class AuthService {
   }
 
   async confirmRegistration(confirmUserDto: ConfirmUserDto): Promise<{ success: true, access_token: string }> {
-    const { email, confirmationCode } = confirmUserDto;
-    const user = await this.redisClient.hgetall(`user:${email}`);
-    const payload = { email };
+    const { userId, confirmationCode } = confirmUserDto;
+    const user = await this.redisClient.hgetall(`user:${userId}`);
+    const payload = { userId };
   
     if (user && user.confirmationCode === confirmationCode) {
-      await this.redisClient.hdel(`user:${email}`, 'confirmationCode');
+      await this.redisClient.hdel(`user:${userId}`, 'confirmationCode');
       return {
         access_token: this.jwtService.sign(payload),
         success: true,

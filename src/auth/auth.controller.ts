@@ -1,7 +1,11 @@
-import { Controller, Request, Post, UseGuards, Body } from '@nestjs/common';
+import { Controller, Request, Post, UseGuards, Body, Query, Get } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { ConfirmUserDto, LoginUserDto, MeDto, OAuthDto, RegisterUserDto } from './auth.dto';
+
+export interface QueryFindUser {
+  id: string
+}
 
 @Controller('auth')
 export class AuthController {
@@ -20,6 +24,11 @@ export class AuthController {
   @Post('register')
   async register(@Body() registerUserDto: RegisterUserDto) {
     return this.authService.register(registerUserDto);
+  }
+
+  @Get('findUser')
+  async findUser(@Query() query: QueryFindUser) {
+    return this.authService.findUser(query);
   }
 
   @Post('me')

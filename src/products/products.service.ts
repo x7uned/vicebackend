@@ -10,18 +10,43 @@ export class ProductsService {
     @Inject('REDIS_CLIENT') private readonly redisClient: Redis,
   ) {}
 
-  async getBrands() {
-    const brandsArray = await this.redisClient.keys('brand:*');
+  async getCategories() {
+    try {
+      const categoryArray = await this.redisClient.keys('category:*');
 
-    const brands = [];
-    for (const brandItem of brandsArray) {
-      const brand = await this.redisClient.hgetall(brandItem);
+      const categories = [];
+      for (const categoryItem of categoryArray) {
+        const category = await this.redisClient.hgetall(categoryItem);
 
-      brands.push(brand)
+        categories.push(category)
+      }
+
+
+      return { categories, success: true };
+    } catch (error) {
+      console.error(error)
+      return { success: false };
     }
+    
+  }
+
+  async getBrands() {
+    try {
+      const brandsArray = await this.redisClient.keys('brand:*');
+
+      const brands = [];
+      for (const brandItem of brandsArray) {
+        const brand = await this.redisClient.hgetall(brandItem);
+
+        brands.push(brand)
+      }
 
 
-    return { brands, success: true };
+      return { brands, success: true };
+    } catch (error) {
+      console.error(error)
+      return { success: false };
+    }
   }
 
   async create(createProductDto: CreateProductDto) {
@@ -49,12 +74,17 @@ export class ProductsService {
     });
 
     const existingBrands = await this.redisClient.keys(`brand:${brand}`);
+    const existingCategories = await this.redisClient.keys(`category:${category.toLowerCase().replace(/\s/g, '')}`)
 
     if (!existingBrands || existingBrands.length === 0) {
       await this.redisClient.hmset(`brand:${brand}`, {
         brandtitle: brand,
         brand: brand.toLowerCase().replace(/\s/g, '')
       });
+    }
+    if (!existingCategories || existingCategories.length === 0) {
+      const categoryKey = existingCategories[0];
+      await this.redisClient.hincrby(categoryKey, 'quantity', 1);
     }
 
     return { productId, success: true };

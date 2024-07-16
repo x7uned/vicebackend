@@ -64,7 +64,7 @@ export class ConfirmUserDto {
   @IsString()
   @IsNotEmpty()
   
-  readonly email: string;
+  readonly userId: string;
 
   @IsString()
   @IsNotEmpty()
