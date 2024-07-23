@@ -33,7 +33,7 @@ export class OrdersService {
             for (const orderKey of existingOrder) {
                 const order = await this.redisClient.hgetall(orderKey);
                 if (order.ownerId === userId && order.status == "new") {
-                    throw new ConflictException('U already have unconfirmed order');
+                    return{success:false ,message:'U already have unconfirmed order (Try later)'};
                 }
             }
 
