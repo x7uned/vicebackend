@@ -1,28 +1,33 @@
-import { Module } from '@nestjs/common';
+// src/app.module.ts
+import { Module, MiddlewareConsumer, RequestMethod } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { RedisModule } from './redis/redis.module';
 import { RedisService } from './redis/redis.service';
 import { RedisController } from './redis/redis.controller';
 import { AuthModule } from './auth/auth.module';
-import { AuthController } from './auth/auth.controller';
-import { ConfigModule } from '@nestjs/config';
 import { MailModule } from './auth/email.module';
 import { ProductsModule } from './products/products.module';
+import { OrdersModule } from './orders/orders.module';
+import { AuthMiddleware } from './auth/auth.middleware';
+import { JwtModule } from './jwt/jwt.module';
+import { OrdersController } from './orders/orders.controller';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    JwtModule,
     RedisModule,
     AuthModule,
     MailModule,
     ProductsModule,
+    OrdersModule,
   ],
   controllers: [
     AppController,
-    AuthController,
     RedisController,
   ],
   providers: [
@@ -30,4 +35,14 @@ import { ProductsModule } from './products/products.module';
     RedisService,
   ],
 })
-export class AppModule {}
+export class AppModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(AuthMiddleware)
+      .forRoutes(
+        { path: 'products', method: RequestMethod.POST },
+        OrdersController,
+        { path: 'auth/me', method: RequestMethod.ALL },
+      );
+  }
+}

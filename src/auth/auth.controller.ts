@@ -1,7 +1,6 @@
-import { Controller, Request, Post, UseGuards, Body, Query, Get } from '@nestjs/common';
+import { Controller, Request, Post, Body, Query, Get, Req } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { JwtAuthGuard } from './jwt-auth.guard';
-import { ConfirmUserDto, LoginUserDto, MeDto, OAuthDto, RegisterUserDto } from './auth.dto';
+import { ConfirmUserDto, LoginUserDto, OAuthDto, RegisterUserDto } from './auth.dto';
 
 export interface QueryFindUser {
   id: string
@@ -31,9 +30,10 @@ export class AuthController {
     return this.authService.findUser(query);
   }
 
-  @Post('me')
-  async me(@Body() meDto: MeDto) {
-    return this.authService.me(meDto);
+  @Get('me')
+  async me(@Req() req: Request) {
+    const userId = req['user'].id;
+    return this.authService.me(userId);
   }
 
   @Post('confirm')
@@ -41,7 +41,6 @@ export class AuthController {
     return this.authService.confirmRegistration(confirmUserDto)
   }
 
-  @UseGuards(JwtAuthGuard)
   @Post('profile')
   getProfile(@Request() req) {
     return req.user;

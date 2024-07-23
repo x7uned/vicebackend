@@ -21,7 +21,7 @@ export class AuthService {
     for (const key of keys) {
       const user = await this.redisClient.hgetall(key);
       if (user.email === email) {
-        if (bcrypt.compareSync(pass, user.password)) {
+         if (bcrypt.compareSync(pass, user.password)) {
           return {
             id: user.id,
             email: user.email,
@@ -50,9 +50,13 @@ export class AuthService {
       confirmationCode: user.confirmationCode || '',
       id: user.id,
     };
+    
+    const accessToken = this.jwtService.sign({id: user.id});
+
     return {
       success: true,
       user: payload,
+      access_token: accessToken,
     };
   }
 
@@ -94,32 +98,33 @@ export class AuthService {
 
     await this.sendConfirmationEmail(email, confirmationCode);
 
-    return { email, success: true };
+    return { userId, success: true };
   }
 
-  async me(meDto: MeDto) {
-    const { id } = meDto;
+  async me(userId: string) {
     const existingUsers = await this.redisClient.keys('user:*');
 
     for (const userKey of existingUsers) {
       const user = await this.redisClient.hgetall(userKey);
-      if (user.id === id || user.email === id) {
-        return { success: true }
+      if (user.id === userId || user.email === userId) {
+        delete user.password;
+        return { success: true, user };
       }
     }
 
-    return { success: false }
+    return { success: false };
   }
 
   async oAuth(oAuthDto: OAuthDto) {
     const { username, email, sub, avatar } = oAuthDto;
+    console.log('oauth', email)
     const existingUsers = await this.redisClient.keys('user:*');
     
     for (const userKey of existingUsers) {
       const user = await this.redisClient.hgetall(userKey);
       if (user.email === email) {
-        const id = user.id;
-        return { message: 'User with this email already exists', id, success: true }
+        const access_token = this.jwtService.sign({id: user.id})
+        return { message: 'User with this email already exists', access_token, success: true }
       }
     }
 
@@ -133,7 +138,9 @@ export class AuthService {
       avatar
     });
 
-    return { message: 'User registered successfully', username, success: true };
+    const access_token = this.jwtService.sign({id: userId})
+
+    return { message: 'User registered successfully', access_token, success: true };
   }
 
   private async sendConfirmationEmail(email: string, confirmationCode: string): Promise<void> {
