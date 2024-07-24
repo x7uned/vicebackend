@@ -1,5 +1,5 @@
 // src/app.module.ts
-import { Module, MiddlewareConsumer, RequestMethod } from '@nestjs/common';
+import { Module, MiddlewareConsumer, RequestMethod, Req } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -13,6 +13,7 @@ import { OrdersModule } from './orders/orders.module';
 import { AuthMiddleware } from './auth/auth.middleware';
 import { JwtModule } from './jwt/jwt.module';
 import { OrdersController } from './orders/orders.controller';
+import { AdminModule } from './admin/admin.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { OrdersController } from './orders/orders.controller';
     MailModule,
     ProductsModule,
     OrdersModule,
+    AdminModule,
   ],
   controllers: [
     AppController,
