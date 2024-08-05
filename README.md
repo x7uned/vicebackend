@@ -17,6 +17,7 @@ Backend for the Vice application, developed using [Nest.js](https://nestjs.com/)
 - [reflect-metadata](https://www.npmjs.com/package/reflect-metadata)
 - [rxjs](https://www.npmjs.com/package/rxjs)
 - [sendgrid](https://www.npmjs.com/package/sendgrid)
+- [multer](https://www.npmjs.com/package/multer)
 - [uuid](https://www.npmjs.com/package/uuid)
 
 ## Getting Started
