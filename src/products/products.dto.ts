@@ -34,10 +34,6 @@ export class CreateProductDto {
     @IsNotEmpty()
     
     readonly price: number;
-
-    @IsBoolean()
-
-    readonly bestseller: boolean;
 }
 
 export class NewBrandDto {

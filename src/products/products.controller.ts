@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Req } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './products.dto';
 
@@ -14,11 +14,14 @@ export interface QueryFindPage {
 
 @Controller('products')
 export class ProductsController {
-  constructor(private readonly productsService: ProductsService) {}
+  constructor(
+    private readonly productsService: ProductsService,
+  ) {}
 
   @Post('create')
-  async login(@Body() createProductDto: CreateProductDto) {
-    return this.productsService.create(createProductDto);
+  async create(@Body() createProductDto: CreateProductDto, @Req() req: Request) {
+    const userId = req['user'].id;
+    return this.productsService.create(createProductDto, userId);
   }
 
   @Get('findPage')
@@ -28,12 +31,12 @@ export class ProductsController {
 
   @Get('categories')
   async getCategories() {
-    return this.productsService.getCategories()
+    return this.productsService.getCategories();
   }
 
   @Get('brands')
   async getBrands() {
-    return this.productsService.getBrands()
+    return this.productsService.getBrands();
   }
 
   @Get(':id')

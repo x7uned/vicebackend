@@ -27,7 +27,7 @@ export class AuthService {
             email: user.email,
             username: user.username,
             avatar: user.avatar,
-            confirmationCode: user.confirmationCode,
+            status: user.status
           };
         } else {
           throw new UnauthorizedException('Invalid credentials');
@@ -47,7 +47,6 @@ export class AuthService {
       email: user.email, 
       username: user.username || '', 
       avatar: user.avatar || '', 
-      confirmationCode: user.confirmationCode || '',
       id: user.id,
     };
     
@@ -57,6 +56,7 @@ export class AuthService {
       success: true,
       user: payload,
       access_token: accessToken,
+      admin: (user.status == "admin")
     };
   }
 
@@ -108,7 +108,7 @@ export class AuthService {
       const user = await this.redisClient.hgetall(userKey);
       if (user.id === userId || user.email === userId) {
         delete user.password;
-        return { success: true, user };
+        return { success: true, user, admin: (user.status == "admin") };
       }
     }
 
@@ -124,7 +124,7 @@ export class AuthService {
       const user = await this.redisClient.hgetall(userKey);
       if (user.email === email) {
         const access_token = this.jwtService.sign({id: user.id})
-        return { message: 'User with this email already exists', access_token, success: true }
+        return { message: 'User with this email already exists', access_token, admin: (user.status == "admin"), success: true }
       }
     }
 

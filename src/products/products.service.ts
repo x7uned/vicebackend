@@ -1,13 +1,13 @@
 import { Injectable, Inject, ConflictException } from '@nestjs/common';
 import { Redis } from 'ioredis';
 import { v4 as uuidv4 } from 'uuid';
-import { CreateProductDto, NewBrandDto } from './products.dto';
+import { CreateProductDto } from './products.dto';
 import { QueryFindPage } from './products.controller';
 
 @Injectable()
 export class ProductsService {
   constructor(
-    @Inject('REDIS_CLIENT') private readonly redisClient: Redis,
+    @Inject('REDIS_CLIENT') private readonly redisClient: Redis
   ) {}
 
   async getCategories() {
@@ -27,7 +27,6 @@ export class ProductsService {
       console.error(error)
       return { success: false };
     }
-    
   }
 
   async getBrands() {
@@ -49,8 +48,9 @@ export class ProductsService {
     }
   }
 
-  async create(createProductDto: CreateProductDto) {
-    const { category, title, subtitle, image, brand, price, bestseller } = createProductDto;
+  async create(createProductDto: CreateProductDto, userId: string) {
+    const { category, title, subtitle, brand, price, image } = createProductDto;
+
     const existingProducts = await this.redisClient.keys('product:*');
 
     for (const productKey of existingProducts) {
@@ -64,13 +64,14 @@ export class ProductsService {
 
     await this.redisClient.hmset(`product:${productId}`, {
       id: productId,
+      ownerId: userId,
       category: category.toLowerCase().replace(/\s/g, ''),
       title,
       subtitle,
       image,
       brand: brand.toLowerCase().replace(/\s/g, ''),
       price,
-      bestseller
+      bestseller: false
     });
 
     const existingBrands = await this.redisClient.keys(`brand:${brand}`);

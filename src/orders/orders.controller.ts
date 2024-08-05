@@ -16,10 +16,5 @@ export class OrdersController {
         async getOrder(@Query("id") id: string, @Req() req: Request) {
             const userId = req['user'].id;
             return this.ordersService.getOrder(id, userId);
-        }
-
-    @Patch('changeStatus')
-        async changeStatus(@Body() changeStatusDto: ChangeStatusDto) {
-        return this.ordersService.changeStatus(changeStatusDto);
     }
 }

@@ -81,26 +81,4 @@ export class OrdersService {
         }
         
     }
-
-    async changeStatus(changeStatusDto: ChangeStatusDto) {
-        try {
-            const { id, newstatus } = changeStatusDto;
-
-            const orderKey = `order:${id}`;
-            const existingOrder = await this.redisClient.hgetall(orderKey);
-
-            if (!existingOrder) {
-            throw new NotFoundException('Order not found');
-            }
-
-            existingOrder.status = newstatus;
-
-            await this.redisClient.hmset(orderKey, existingOrder);
-
-            return { success: true, existingOrder };
-        } catch (error) {
-            console.error(error);
-            return { success: false, message: error.message };
-        }
-    }
 }

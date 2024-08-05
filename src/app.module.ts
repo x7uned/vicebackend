@@ -14,11 +14,19 @@ import { AuthMiddleware } from './auth/auth.middleware';
 import { JwtModule } from './jwt/jwt.module';
 import { OrdersController } from './orders/orders.controller';
 import { AdminModule } from './admin/admin.module';
+import { UploadModule } from './upload/upload.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
+import { ProductsController } from './products/products.controller';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+    }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'uploads'),
+      serveRoot: '/uploads',
     }),
     JwtModule,
     RedisModule,
@@ -27,6 +35,7 @@ import { AdminModule } from './admin/admin.module';
     ProductsModule,
     OrdersModule,
     AdminModule,
+    UploadModule,
   ],
   controllers: [
     AppController,
@@ -42,7 +51,7 @@ export class AppModule {
     consumer
       .apply(AuthMiddleware)
       .forRoutes(
-        { path: 'products', method: RequestMethod.POST },
+        { path: 'products/create', method: RequestMethod.POST },
         OrdersController,
         { path: 'auth/me', method: RequestMethod.ALL },
       );

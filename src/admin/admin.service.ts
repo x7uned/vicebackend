@@ -1,5 +1,6 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import Redis from 'ioredis';
+import { ChangeStatusDto } from 'src/orders/orders.dto';
 
 @Injectable()
 export class AdminService {
@@ -20,4 +21,26 @@ export class AdminService {
     
         return { success: false };
     }
+
+    async changeStatus(changeStatusDto: ChangeStatusDto) {
+      try {
+          const { id, newstatus } = changeStatusDto;
+
+          const orderKey = `order:${id}`;
+          const existingOrder = await this.redisClient.hgetall(orderKey);
+
+          if (!existingOrder) {
+          throw new NotFoundException('Order not found');
+          }
+
+          existingOrder.status = newstatus;
+
+          await this.redisClient.hmset(orderKey, existingOrder);
+
+          return { success: true, existingOrder };
+      } catch (error) {
+          console.error(error);
+          return { success: false, message: error.message };
+      }
+  }
 }
