@@ -2,6 +2,7 @@
 /dist
 /node_modules
 /build
+/uploads
 
 # Logs
 logs
@@ -43,7 +44,6 @@ lerna-debug.log*
 .env.local
 .temp
 .tmp
-.uploads/
 
 # Runtime data
 pids

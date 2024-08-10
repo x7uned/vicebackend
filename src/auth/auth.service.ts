@@ -21,7 +21,7 @@ export class AuthService {
     for (const key of keys) {
       const user = await this.redisClient.hgetall(key);
       if (user.email === email) {
-         if (bcrypt.compareSync(pass, user.password)) {
+         if (user.password && bcrypt.compareSync(pass, user.password)) {
           return {
             id: user.id,
             email: user.email,
@@ -67,8 +67,24 @@ export class AuthService {
     
     for (const userKey of existingUsers) {
       const user = await this.redisClient.hgetall(userKey);
+      const productsAll = await this.redisClient.keys(`product:*`);
+      const ordersAll = await this.redisClient.keys(`order:*`);
+      const products = [];
+      const orders = [];
+      for (const productKey of productsAll) {
+        const product = await this.redisClient.hgetall(productKey);
+        if(product.ownerId == user.id) {
+          products.push(product)
+        }
+      }
+      for (const orderKey of ordersAll) {
+        const order = await this.redisClient.hgetall(orderKey);
+        if(order.ownerId == user.id) {
+          orders.push(order)
+        }
+      }
       delete(user.password)
-      return {success: true, user}
+      return {success: true, user: {...user, products, orders}}
     }
     return {success:false}
   }

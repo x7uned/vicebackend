@@ -1,7 +1,5 @@
-import { Injectable, Inject, ConflictException } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { Redis } from 'ioredis';
-import { v4 as uuidv4 } from 'uuid';
-import { CreateProductDto } from './products.dto';
 import { QueryFindPage } from './products.controller';
 
 @Injectable()
@@ -46,49 +44,6 @@ export class ProductsService {
       console.error(error)
       return { success: false };
     }
-  }
-
-  async create(createProductDto: CreateProductDto, userId: string) {
-    const { category, title, subtitle, brand, price, image } = createProductDto;
-
-    const existingProducts = await this.redisClient.keys('product:*');
-
-    for (const productKey of existingProducts) {
-      const product = await this.redisClient.hgetall(productKey);
-      if (product.title === title) {
-        throw new ConflictException('Product with this title already exists');
-      }
-    }
-
-    const productId = uuidv4();
-
-    await this.redisClient.hmset(`product:${productId}`, {
-      id: productId,
-      ownerId: userId,
-      category: category.toLowerCase().replace(/\s/g, ''),
-      title,
-      subtitle,
-      image,
-      brand: brand.toLowerCase().replace(/\s/g, ''),
-      price,
-      bestseller: false
-    });
-
-    const existingBrands = await this.redisClient.keys(`brand:${brand}`);
-    const existingCategories = await this.redisClient.keys(`category:${category.toLowerCase().replace(/\s/g, '')}`)
-
-    if (!existingBrands || existingBrands.length === 0) {
-      await this.redisClient.hmset(`brand:${brand}`, {
-        brandtitle: brand,
-        brand: brand.toLowerCase().replace(/\s/g, '')
-      });
-    }
-    if (!existingCategories || existingCategories.length === 0) {
-      const categoryKey = existingCategories[0];
-      await this.redisClient.hincrby(categoryKey, 'quantity', 1);
-    }
-
-    return { productId, success: true };
   }
 
   async findPage(query: QueryFindPage) {

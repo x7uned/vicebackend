@@ -28,6 +28,13 @@ export class OrdersService {
         try {
             const {firstname, secondname, surname, number, email, postname, address, paymentmethod, cart, comment} = createOrderDto;
 
+            console.log(cart) // [
+            //     { id: 'bf53e7d1-9987-43d6-9346-962ffa401af6', quantity: 1 },
+            //     { id: '189139ed-93ee-44e6-a11c-a44052ef51f7', quantity: 2 },
+            //     { id: '6b200089-71d2-4e8b-9e51-2bba9396c8c0', quantity: 1 },
+            //     { id: 'fe4f3ad3-e1ad-4934-b189-955abbfe4c19', quantity: 1 }
+            //   ] Выглядит примерно так
+
             const existingOrder = await this.redisClient.keys('order:*');
 
             for (const orderKey of existingOrder) {
@@ -36,6 +43,8 @@ export class OrdersService {
                     return{success:false ,message:'U already have unconfirmed order (Try later)'};
                 }
             }
+
+            const serializedCart = JSON.stringify(cart);
 
             const orderId = uuidv4();
 
@@ -51,7 +60,7 @@ export class OrdersService {
                 postname,
                 address,
                 paymentmethod,
-                cart,
+                cart: serializedCart,
                 comment
             });
 

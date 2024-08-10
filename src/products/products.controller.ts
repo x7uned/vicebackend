@@ -18,12 +18,6 @@ export class ProductsController {
     private readonly productsService: ProductsService,
   ) {}
 
-  @Post('create')
-  async create(@Body() createProductDto: CreateProductDto, @Req() req: Request) {
-    const userId = req['user'].id;
-    return this.productsService.create(createProductDto, userId);
-  }
-
   @Get('findPage')
   async findPage(@Query() query: QueryFindPage) {
     return this.productsService.findPage(query);
