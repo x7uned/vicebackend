@@ -1,23 +1,22 @@
 // src/app.module.ts
-import { Module, MiddlewareConsumer, RequestMethod, Req } from '@nestjs/common';
+import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { RedisModule } from './redis/redis.module';
-import { RedisService } from './redis/redis.service';
-import { RedisController } from './redis/redis.controller';
-import { AuthModule } from './auth/auth.module';
-import { MailModule } from './auth/email.module';
-import { ProductsModule } from './products/products.module';
-import { OrdersModule } from './orders/orders.module';
-import { AuthMiddleware } from './auth/auth.middleware';
-import { JwtModule } from './jwt/jwt.module';
-import { OrdersController } from './orders/orders.controller';
-import { AdminModule } from './admin/admin.module';
-import { UploadModule } from './upload/upload.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
-import { ProductsController } from './products/products.controller';
+import { AdminModule } from './admin/admin.module';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+import { AuthMiddleware } from './auth/auth.middleware';
+import { AuthModule } from './auth/auth.module';
+import { MailModule } from './auth/email.module';
+import { JwtModule } from './jwt/jwt.module';
+import { OrdersController } from './orders/orders.controller';
+import { OrdersModule } from './orders/orders.module';
+import { ProductsModule } from './products/products.module';
+import { RedisController } from './redis/redis.controller';
+import { RedisModule } from './redis/redis.module';
+import { RedisService } from './redis/redis.service';
+import { UploadModule } from './upload/upload.module';
 
 @Module({
   imports: [
@@ -37,14 +36,8 @@ import { ProductsController } from './products/products.controller';
     AdminModule,
     UploadModule,
   ],
-  controllers: [
-    AppController,
-    RedisController,
-  ],
-  providers: [
-    AppService,
-    RedisService,
-  ],
+  controllers: [AppController, RedisController],
+  providers: [AppService, RedisService],
 })
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {
@@ -54,6 +47,7 @@ export class AppModule {
         { path: 'products/create', method: RequestMethod.POST },
         OrdersController,
         { path: 'auth/me', method: RequestMethod.ALL },
+        { path: 'auth/updateProfile', method: RequestMethod.ALL },
       );
   }
 }

@@ -1,9 +1,24 @@
-import { Controller, Request, Post, Body, Query, Get, Req } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Put,
+  Query,
+  Req,
+  Request,
+} from '@nestjs/common';
+import {
+  ConfirmUserDto,
+  LoginUserDto,
+  OAuthDto,
+  RegisterUserDto,
+  UpdateProfileDto,
+} from './auth.dto';
 import { AuthService } from './auth.service';
-import { ConfirmUserDto, LoginUserDto, OAuthDto, RegisterUserDto } from './auth.dto';
 
 export interface QueryFindUser {
-  id: string
+  id: string;
 }
 
 @Controller('auth')
@@ -18,6 +33,12 @@ export class AuthController {
   @Post('oauth')
   async oauth(@Body() oAuthDto: OAuthDto) {
     return this.authService.oAuth(oAuthDto);
+  }
+
+  @Put('updateProfile')
+  async updateProfile(@Req() req, @Body() updateProfileDto: UpdateProfileDto) {
+    const userId = req['user'].id;
+    return this.authService.updateProfile(userId, updateProfileDto);
   }
 
   @Post('register')
@@ -38,7 +59,7 @@ export class AuthController {
 
   @Post('confirm')
   async confirm(@Body() confirmUserDto: ConfirmUserDto) {
-    return this.authService.confirmRegistration(confirmUserDto)
+    return this.authService.confirmRegistration(confirmUserDto);
   }
 
   @Post('profile')

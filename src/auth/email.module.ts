@@ -1,5 +1,5 @@
-import { Module } from '@nestjs/common';
 import { MailerModule } from '@nestjs-modules/mailer';
+import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
@@ -13,7 +13,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
           secure: false,
           auth: {
             user: 'apikey',
-            pass: process.env.SENDGRID_API_KEY
+            pass: process.env.SENDGRID_API_KEY,
           },
         },
         defaults: {
@@ -24,5 +24,4 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     }),
   ],
 })
-
 export class MailModule {}

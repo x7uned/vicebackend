@@ -1,8 +1,13 @@
-import { Controller, Post, UploadedFile, UseInterceptors, UsePipes } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  UploadedFile,
+  UseInterceptors,
+  UsePipes,
+} from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
-import { Express } from 'express';
 import { FileValidationPipe } from './upload.validation';
 
 function configureMulter(destination: string, prefix: string) {
@@ -42,7 +47,6 @@ export class FileUploadController {
   )
   @UsePipes(new FileValidationPipe())
   uploadProductPhoto(@UploadedFile() file: Express.Multer.File) {
-    console.log(file);
     const fileUrl = `${this.baseUrl}/products/${file.filename}`;
     return { message: 'Product photo uploaded successfully!', fileUrl };
   }

@@ -1,22 +1,19 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Req } from '@nestjs/common';
+import { Controller, Delete, Get, Param, Query } from '@nestjs/common';
 import { ProductsService } from './products.service';
-import { CreateProductDto } from './products.dto';
 
 export interface QueryFindPage {
-  page: string,
-  search: string,
-  category: string,
-  pricemin: string,
-  pricemax: string,
-  brand: string,
-  sort: string
+  page: string;
+  search: string;
+  category: string;
+  pricemin: string;
+  pricemax: string;
+  brand: string;
+  sort: string;
 }
 
 @Controller('products')
 export class ProductsController {
-  constructor(
-    private readonly productsService: ProductsService,
-  ) {}
+  constructor(private readonly productsService: ProductsService) {}
 
   @Get('findPage')
   async findPage(@Query() query: QueryFindPage) {

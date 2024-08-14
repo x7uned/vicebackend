@@ -1,12 +1,10 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { Redis } from 'ioredis';
 import { QueryFindPage } from './products.controller';
 
 @Injectable()
 export class ProductsService {
-  constructor(
-    @Inject('REDIS_CLIENT') private readonly redisClient: Redis
-  ) {}
+  constructor(@Inject('REDIS_CLIENT') private readonly redisClient: Redis) {}
 
   async getCategories() {
     try {
@@ -16,13 +14,12 @@ export class ProductsService {
       for (const categoryItem of categoryArray) {
         const category = await this.redisClient.hgetall(categoryItem);
 
-        categories.push(category)
+        categories.push(category);
       }
-
 
       return { categories, success: true };
     } catch (error) {
-      console.error(error)
+      console.error(error);
       return { success: false };
     }
   }
@@ -35,13 +32,12 @@ export class ProductsService {
       for (const brandItem of brandsArray) {
         const brand = await this.redisClient.hgetall(brandItem);
 
-        brands.push(brand)
+        brands.push(brand);
       }
-
 
       return { brands, success: true };
     } catch (error) {
-      console.error(error)
+      console.error(error);
       return { success: false };
     }
   }
@@ -52,8 +48,8 @@ export class ProductsService {
     const offset = (page - 1) * pageSize;
     const productKeys = await this.redisClient.keys('product:*');
 
-    if(query.brand == 'DarkProject') {
-      query.brand = 'Dark project'
+    if (query.brand == 'DarkProject') {
+      query.brand = 'Dark project';
     }
 
     let products = [];
@@ -62,11 +58,19 @@ export class ProductsService {
 
       let match = true;
 
-      if (query.category && query.category !== product.category && query.category != 'all') {
+      if (
+        query.category &&
+        query.category !== product.category &&
+        query.category != 'all'
+      ) {
         match = false;
       }
 
-      if (query.brand && query.brand !== product.brand && query.brand != 'all') {
+      if (
+        query.brand &&
+        query.brand !== product.brand &&
+        query.brand != 'all'
+      ) {
         match = false;
       }
 
@@ -109,8 +113,7 @@ export class ProductsService {
       totalProducts: products.length,
       products: productsSlice,
     };
-}
-
+  }
 
   findOne(id: number) {
     return `This action returns a #${id} product`;

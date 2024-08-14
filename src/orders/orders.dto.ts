@@ -1,8 +1,19 @@
-import { IsString, Length, IsPhoneNumber, IsEmail, IsIn, IsOptional, IsNotEmpty, IsArray, ArrayNotEmpty, ValidateNested, IsInt, Min } from 'class-validator';
 import { Type } from 'class-transformer';
+import {
+  ArrayNotEmpty,
+  IsArray,
+  IsEmail,
+  IsIn,
+  IsInt,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  Length,
+  Min,
+  ValidateNested,
+} from 'class-validator';
 
 class CartItemDto {
-
   @IsString({ message: 'Product ID must be a string' })
   readonly id: string;
 
@@ -12,7 +23,6 @@ class CartItemDto {
 }
 
 export class CreateOrderDto {
-
   @IsString({ message: 'First name must be a string' })
   @Length(1, 50, { message: 'First name must be between 1 and 50 characters' })
   readonly firstname: string;
@@ -34,7 +44,9 @@ export class CreateOrderDto {
   readonly email: string;
 
   @IsString({ message: 'Post name must be a string' })
-  @IsIn(['meest', 'uapost', 'novapost', 'self'], { message: 'Invalid post name' })
+  @IsIn(['meest', 'uapost', 'novapost', 'self'], {
+    message: 'Invalid post name',
+  })
   readonly postname: string;
 
   @IsString({ message: 'Address must be a string' })
@@ -42,7 +54,9 @@ export class CreateOrderDto {
   readonly address: string;
 
   @IsString({ message: 'Payment method must be a string' })
-  @IsIn(['creditcard', 'paypal', 'onreceipt', 'monopay', 'applepay'], { message: 'Invalid payment method' })
+  @IsIn(['creditcard', 'paypal', 'onreceipt', 'monopay', 'applepay'], {
+    message: 'Invalid payment method',
+  })
   readonly paymentmethod: string;
 
   @IsOptional()
@@ -52,7 +66,10 @@ export class CreateOrderDto {
 
   @IsArray({ message: 'Cart must be an array' })
   @ArrayNotEmpty({ message: 'Cart must not be empty' })
-  @ValidateNested({ each: true, message: 'Each item in the cart must be a valid object' })
+  @ValidateNested({
+    each: true,
+    message: 'Each item in the cart must be a valid object',
+  })
   @Type(() => CartItemDto)
   readonly cart: CartItemDto[];
 }
@@ -60,19 +77,29 @@ export class CreateOrderDto {
 export class ChangeStatusDto {
   @IsString({ message: 'ID must be a string' })
   @IsNotEmpty({ message: 'ID cannot be empty' })
-
   readonly id: string;
 
   @IsString({ message: 'New status must be a string' })
-  @IsIn(['new', 'confirmed', 'paid', 'processing', 'shipped', 'delivered', 'cancelled', 'returned', 'refunded'], { message: 'Invalid new status' })
+  @IsIn(
+    [
+      'new',
+      'confirmed',
+      'paid',
+      'processing',
+      'shipped',
+      'delivered',
+      'cancelled',
+      'returned',
+      'refunded',
+    ],
+    { message: 'Invalid new status' },
+  )
   @IsNotEmpty({ message: 'New status cannot be empty' })
-
   readonly newstatus: string;
 }
 
 export class GetOrderDto {
   @IsString({ message: 'ID must be a string' })
   @IsNotEmpty({ message: 'ID cannot be empty' })
-
   readonly id: string;
 }
