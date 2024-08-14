@@ -26,8 +26,8 @@ To get started with the Vice Backend project, follow these steps:
 
 1. **Clone the repository:**
 
-   git clone https://github.com/x7uned/vice-backend.git
-   cd vice-backend
+   git clone https://github.com/x7uned/vicebackend
+   cd vicebackend
 
 2. **Install dependencies:**
 
